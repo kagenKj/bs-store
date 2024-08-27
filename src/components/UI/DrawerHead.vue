@@ -1,7 +1,8 @@
 <script setup>
-    import { inject } from 'vue';
+    import { useStore } from 'vuex';
 
-    const { closeDrawer } = inject('cart')
+    const store = useStore()
+    const closeDrawer = () => store.commit('closeDrawer')
 </script>
 
 <template>
@@ -13,4 +14,3 @@
         <h2 class="text-2xl font-bold">Корзина</h2>
     </div>
 </template>
-

@@ -5,7 +5,6 @@
     import { inject, reactive, watch,  onMounted, provide } from 'vue';
 
    
-
     const { items } = inject('items')
     const {cart, addToCart, removeFromCart} = inject('cart')
 
@@ -135,7 +134,7 @@
             </div>
             <select @change="onChangeSelect"
                 class="h-8.5 border rounded-lg px-3 outline-none cursor-pointer focus:border-gray-500">
-                <option disabled>Выберите из списка</option>
+                <option disabled value="">Выберите из списка</option>
                 <option value="price">По возрастанию цены</option>
                 <option value="-price">По убыванию цены</option>
             </select>

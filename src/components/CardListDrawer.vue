@@ -1,8 +1,13 @@
 <script setup>
     import MyDrawerCard from '@/components/UI/MyDrawerCard.vue';
-    import { inject } from 'vue';
+    import { computed } from 'vue';
+    import { useStore } from 'vuex';
 
-    const { cart, removeFromCart} = inject('cart')
+    const store = useStore()
+    const cart = computed(() => store.state.cart)
+    const removeFromCart = (item) => {
+        store.commit('removeFromCart', item)
+    }
 </script>
 
 <template>
