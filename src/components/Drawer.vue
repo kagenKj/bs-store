@@ -3,14 +3,16 @@
     import DrawerHead from './UI/DrawerHead.vue';
     import CardListDrawer from './CardListDrawer.vue';
     import InfoBlock from './UI/InfoBlock.vue';
-    import { computed, inject,  ref } from 'vue';
+    import { computed, ref } from 'vue';
+    import { useStore } from 'vuex';
 
-    const props = defineProps({
-        totalPrice: Number,
-        vatPrice: Number,
-    })
+    const store = useStore()
 
-    const { cart, closeDrawer } = inject('cart')
+    const totalPrice = computed(() => store.getters.totalPrice)
+    const vatPrice = computed(() => store.getters.vatPrice)
+    const cart = computed(() => store.state.cart)
+    const closeDrawer = () => store.commit('closeDrawer')
+
     
     const isCreatingOrder = ref(false)
     const orderId = ref(null)
@@ -24,10 +26,10 @@
             isCreatingOrder.value = true
             const { data } = await axios.post(`https://b56e406d46f923e3.mokky.dev/orders`, {
                 items: cart.value,
-                totalPrice: props.totalPrice
+                totalPrice: totalPrice.value
             })
             
-            cart.value = []
+            store.commit('setCart', [])
             orderId.value = data.id
         } catch (e) {
             alert('Ошибка!')
@@ -47,7 +49,6 @@
             <div v-if="!totalPrice || orderId" class="flex h-full items-center">
                 <InfoBlock v-if="!totalPrice && !orderId"  title="Корзина пустая" description="Добавьте товар, чтобы сделать заказ"></InfoBlock>
                 <InfoBlock v-if="orderId" title="Ура! Ваш заказ оформлен!" :description="`Номер заказа: #${orderId}. Совсем скоро он будет передан в доставку :)`"></InfoBlock>
-                
             </div>
 
             <div v-else>

@@ -1,11 +1,12 @@
 <script setup>
-defineProps({
-    totalPrice: Number
-})
+    import { computed } from 'vue';
+    import { useStore } from 'vuex';
 
-const emit = defineEmits(
-    ['openDrawer']
-)
+    const store = useStore()
+
+    const totalPrice = computed(() => store.getters.totalPrice)
+    
+    const openDrawer = () => store.commit('openDrawer')
 </script>
 
 <template>
@@ -18,7 +19,7 @@ const emit = defineEmits(
             </div>
             <div class="flex items-center">
                 <ul class="flex items-center gap-5">
-                    <li @click="() => emit('openDrawer')"
+                    <li @click="openDrawer"
                         class="flex items-center cursor-pointer text-slate-400 hover:text-black">
                         <img src="/public/cart.svg" class="mr-1"><span>Корзина ({{ totalPrice }} руб.)</span>
                     </li>

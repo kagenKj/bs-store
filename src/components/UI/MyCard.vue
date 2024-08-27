@@ -16,10 +16,10 @@ defineProps({
 <template>
     <div
         class="relative  bg-white border p-8 border-slate-100 rounded-2xl cursor-pointer transition hover:-translate-y-2 hover:shadow-xl">
-        <img @click="onClickFavorite" :src="isFavorite ? '/public/like-2.svg' : '/public/like-1.svg'"
+        <img v-if="onClickFavorite" @click="onClickFavorite" :src="isFavorite ? '/public/like-2.svg' : '/public/like-1.svg'"
             class="absolute top-8 left-8">
         <div class="flex flex-col items-center">
-            <img :src="imageUrl" alt="Кроссовок" class="max-h-56" />
+            <img :src="imageUrl" alt="Кроссовки" class="max-h-56" />
         </div>
         <p class="mt-2">
             {{ title }}
@@ -35,7 +35,7 @@ defineProps({
                 </b>
 
             </div>
-            <img @click="onClickAdd" :src="!isAdded ? '/public/plus.svg' : '/public/checked.svg'" alt="Добавить" />
+            <img v-if="onClickAdd" @click="onClickAdd" :src="!isAdded ? '/public/plus.svg' : '/public/checked.svg'" alt="Добавить" />
         </div>
     </div>
 </template>
