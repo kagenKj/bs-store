@@ -1,125 +1,57 @@
 <script setup>
-    import axios from 'axios'
     import debounce from 'lodash.debounce';
     import CardList from '@/components/CardList.vue'
-    import { inject, reactive, watch,  onMounted, provide } from 'vue';
+    import { watch, onMounted, computed } from 'vue';
+    import { useStore } from 'vuex';
 
-   
-    const { items } = inject('items')
-    const {cart, addToCart, removeFromCart} = inject('cart')
+    const store = useStore()
 
-    const filters = reactive({
-        sortBy: 'title',
-        searchQuery: ''
-    })
+    const items = computed(() => store.state.items)
+
+    const cart = computed(() => store.state.cart)
+
+
+    const filters = computed(() => store.state.filters)
     
-    const onChangeSelect = event => {
-        filters.sortBy = event.target.value
-    }
+    const onChangeSelect = (event) => store.commit('setFiltersSortBy', event.target.value)
 
     const onChangeSearchInput = debounce(event => {
-        filters.searchQuery = event.target.value
+        store.commit('setFiltersSearchQuery', event.target.value)
     }, 500)
 
-    const onClickAddPlus = (item) => {
-        if (!item.isAdded) {
-            addToCart(item)
-        } else {
-            removeFromCart(item)
-        }
-    }
+
+    const onClickAddPlus = (item) => store.commit('onClickAddPlus', item)
+  
+ 
+    const addToFavorites = (item) =>  store.dispatch('addToFavorites', item)
+  
+
+    const fetchFavorites = () => store.dispatch('fetchFavorites')
 
 
-    const addToFavorites = async (item) => {
-        try {
-            if (!item.isFavorite) {
-                const obj = {
-                    item_id: item.id,
-                    item
-                }
-                item.isFavorite = true
-                const { data } = await axios.post(`https://b56e406d46f923e3.mokky.dev/favorites`, obj)
-                item.favoriteId = data.id
-            } else {
-                item.isFavorite = false
-                await axios.delete(`https://b56e406d46f923e3.mokky.dev/favorites/${item.favoriteId}`)
-                item.favoriteId = null
-            }
-        } catch (e) {
-            alert("Ошибка!", e)
-        }
-    }
+    const fetchItems = () => store.dispatch('fetchItems')
 
-    const fetchFavorites = async () => {
-        try {
-            const { data: favorites } = await axios.get(`https://b56e406d46f923e3.mokky.dev/favorites`)
-            items.value = items.value.map(item => {
-                const favorite = favorites.find(favorite => favorite.item_id === item.id)
 
-                if (!favorite) {
-                    return item
-                }
+    watch(filters, fetchItems, { deep: true })
 
-                return {
-                    ...item,
-                    isFavorite: true,
-                    favoriteId: favorite.id,
-                }
-            })
-        } catch (e) {
-            alert('Ошибка!')
-        }
-    }
-
-    const fetchItems = async () => {
-        try {
-            const params = {
-                sortBy: filters.sortBy,
-            }
-
-            if (filters.searchQuery) {
-                params.title = `*${filters.searchQuery}*`
-            }
-
-            const { data } = await axios.get('https://b56e406d46f923e3.mokky.dev/items',
-                {
-                    params
-                }
-            )
-            items.value = data.map((obj) => ({
-                ...obj,
-                isFavorite: false,
-                favoriteId: null,
-                idAdded: false
-            }))
-        } catch (e) {
-            alert('Ошибка!')
-        }
-    }
-
-    watch(filters, fetchItems)
 
     watch(cart, () => {
-        items.value = items.value.map((item) => ({
+        store.commit('setItems', items.value.map((item) => ({
             ...item,
             isAdded: false
-        }))
+        })))
     })
-
+    
     onMounted(async () => {
         const localCart = localStorage.getItem('cart')
-        cart.value = localCart ? JSON.parse(localCart) : []
+        store.commit('setCart', localCart ? JSON.parse(localCart) : [] )
         await fetchItems()
         await fetchFavorites()
-        items.value = items.value.map((item) => ({
+        store.commit('setItems', items.value.map((item) => ({
             ...item,
             isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
-        }))
+        })))
     })
-    provide('addToFavorites',  addToFavorites)
-    provide('onClickAddPlus',  onClickAddPlus)
-    
-   
 </script>
 
 <template>
@@ -141,5 +73,4 @@
         </div>
     </div>
     <card-list :items="items" @add-to-favorite="addToFavorites" @add-to-cart="onClickAddPlus"></card-list>
-
 </template>

@@ -30,4 +30,3 @@
         ></my-card>
     </div>
 </template>
-

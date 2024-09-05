@@ -5,8 +5,6 @@ import App from './App.vue'
 import './assets/main.css'
 import Favorites from "@/pages/Favorites.vue"
 import Home from "@/pages/Home.vue"
-import HomeCopy from "@/pages/HomeСopy.vue"
-import FavoritesCopy from "@/pages/FavoritesСopy.vue"
 import store from '@/store/store'
 import Profile from '@/pages/Profile.vue'
 
@@ -14,12 +12,12 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: HomeCopy
+        component: Home
     },
     {
         path: '/favorites',
         name: 'Favorites',
-        component: FavoritesCopy
+        component: Favorites
     },
     {
         path: '/profile',
@@ -33,6 +31,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
 const app = createApp(App)
 
 

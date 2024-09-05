@@ -1,8 +1,11 @@
 <script setup>
 import { watch, computed } from 'vue'
+import { useStore } from 'vuex';
+
 import Navbar from '@/components/Navbar.vue'
 import Drawer from '@/components/Drawer.vue'
-import { useStore } from 'vuex';
+import Footer from '@/components/Footer.vue'
+
 
 const store = useStore()
 
@@ -27,7 +30,7 @@ watch(cart, () => {
 </script>
 
 <template>
-    <div class="bg-yellow-100 min-h-screen">
+    <div class="bg-yellow-100 min-h-screen flex flex-col">
         <Drawer v-if="isDrawerOpen" :total-price="totalPrice" :vat-price="vatPrice"></Drawer>
         <Navbar :total-price="totalPrice" @open-drawer="openDrawer"></Navbar>
         <div class=" bg-white h-auto mt-10 w-4/5 m-auto rounded-2xl shadow-2xl p-10">
@@ -35,6 +38,7 @@ watch(cart, () => {
                 <router-view></router-view>
             </div>
         </div>
+        <Footer></Footer>
     </div>
 </template>
 

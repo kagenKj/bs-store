@@ -101,6 +101,17 @@ export default createStore({
                     params
                 })
 
+                // const updatedItems = data.map(item => {
+                //     const existingItem = state.items.find(i => i.id === item.id);
+                //     return {
+                //         ...item,
+                //         isAdded: existingItem ? existingItem.isAdded : false,
+                //         isFavorite: existingItem ? existingItem.isFavorite : false,
+                //     };
+                // });
+    
+                // commit('setItems', updatedItems);
+
                 commit('setItems', data.map(item => ({
                     ...item,
                     isFavorite: false,
@@ -115,6 +126,17 @@ export default createStore({
         async fetchFavorites({ commit, state }) {
             try {
                 const { data: favorites } = await axios.get('https://b56e406d46f923e3.mokky.dev/favorites')
+
+                // const updatedItems = state.items.map(item => {
+                //     const favorite = favorites.find(favorite => favorite.item_id === item.id);
+                //     return {
+                //         ...item,
+                //         isFavorite: favorite ? true : item.isFavorite,
+                //         favoriteId: favorite ? favorite.id : null,
+                //     };
+                // });
+    
+                // commit('setItems', updatedItems);
                 commit('setItems', state.items.map(item => {
                     const favorite = favorites.find(favorite => favorite.item_id === item.id)
                     if (favorite) {
