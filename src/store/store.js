@@ -53,25 +53,25 @@ export default createStore({
             state.cart.push(item)
             const itemInItems = state.items.find(listItem => listItem.id === item.id)
             if (itemInItems) {
-                itemInItems.isAdded = true;
+                itemInItems.isAdded = true
             }
-            const itemInFavorites = state.favorites.find(favItem => favItem.id === item.id);
+            const itemInFavorites = state.favorites.find(favItem => favItem.id === item.id)
             if (itemInFavorites) {
-                itemInFavorites.isAdded = true;
+                itemInFavorites.isAdded = true
             }
         },
 
         removeFromCart(state, item) {
             const index = state.cart.findIndex(cartItem => cartItem.id === item.id)
             if (index > -1) {
-                state.cart.splice(index, 1);
+                state.cart.splice(index, 1)
                 const itemInItems = state.items.find(listItem => listItem.id === item.id)
                 if (itemInItems) {
                     itemInItems.isAdded = false
                 }
-                const itemInFavorites = state.favorites.find(favItem => favItem.id === item.id);
+                const itemInFavorites = state.favorites.find(favItem => favItem.id === item.id)
                 if (itemInFavorites) {
-                    itemInFavorites.isAdded = false;
+                    itemInFavorites.isAdded = false
                 }
             }
         },
@@ -79,11 +79,47 @@ export default createStore({
     },
 
     actions: {
-        onClickAddPlus({ commit }, item) {
-            if (!item.isAdded) {
-                commit('addToCart', item)
-            } else {
-                commit('removeFromCart', item)
+        async onClickAddPlus({ commit, state }, item) {
+            try {
+                if (!item.isAdded) {
+                    commit('addToCart', item);
+        
+                    if (item.isFavorite) {
+                        await axios.patch(`https://b56e406d46f923e3.mokky.dev/favorites/${item.favoriteId}`, {
+                                item_id: item.id,
+                                item: {
+                                    ...item,
+                                    isAdded: true 
+                                }
+                            }
+                        )
+
+                        const favoriteIndex = state.favorites.findIndex(fav => fav.favoriteId === item.favoriteId)
+                        if (favoriteIndex > -1) {
+                            state.favorites[favoriteIndex].isAdded = true
+                        }
+                    }
+                } else {
+                    commit('removeFromCart', item)
+    
+                    if (item.isFavorite) {
+                        await axios.patch(`https://b56e406d46f923e3.mokky.dev/favorites/${item.favoriteId}`, 
+                            {
+                                item_id: item.id,
+                                item: {
+                                    ...item,
+                                    isAdded: false 
+                                }
+                            }
+                        )
+                        const favoriteIndex = state.favorites.findIndex(fav => fav.favoriteId === item.favoriteId)
+                        if (favoriteIndex > -1) {
+                            state.favorites[favoriteIndex].isAdded = false
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Ошибка при добавлении/удалении в корзину:', e);
             }
         },
 
@@ -101,23 +137,15 @@ export default createStore({
                     params
                 })
 
-                // const updatedItems = data.map(item => {
-                //     const existingItem = state.items.find(i => i.id === item.id);
-                //     return {
-                //         ...item,
-                //         isAdded: existingItem ? existingItem.isAdded : false,
-                //         isFavorite: existingItem ? existingItem.isFavorite : false,
-                //     };
-                // });
-    
-                // commit('setItems', updatedItems);
 
                 commit('setItems', data.map(item => ({
                     ...item,
-                    isFavorite: false,
+                    isFavorite: state.favorites.some(favItem => favItem.id === item.id),
                     favoriteId: null,
-                    isAdded: false
+                    isAdded: state.cart.some(cartItem => cartItem.id === item.id)
                 })))
+
+                await this.dispatch('fetchFavorites');
             } catch (e) {
                 console.log('Ошибка при получении товаров:', e)
             }
@@ -127,16 +155,6 @@ export default createStore({
             try {
                 const { data: favorites } = await axios.get('https://b56e406d46f923e3.mokky.dev/favorites')
 
-                // const updatedItems = state.items.map(item => {
-                //     const favorite = favorites.find(favorite => favorite.item_id === item.id);
-                //     return {
-                //         ...item,
-                //         isFavorite: favorite ? true : item.isFavorite,
-                //         favoriteId: favorite ? favorite.id : null,
-                //     };
-                // });
-    
-                // commit('setItems', updatedItems);
                 commit('setItems', state.items.map(item => {
                     const favorite = favorites.find(favorite => favorite.item_id === item.id)
                     if (favorite) {
@@ -148,12 +166,19 @@ export default createStore({
                     }
                     return item
                 }))
+
+                commit('setItems', state.items.map(item => ({
+                    ...item,
+                    isFavorite: favorites.some(favItem => favItem.item_id === item.id),
+                    isAdded: state.cart.some(cartItem => cartItem.id === item.id),
+                })))
+
             } catch (e) {
                 console.log('Ошибка при получении избранного:', e)
             }
         },
 
-        async addToFavorites({ commit, state }, item) {
+        async addToFavorites({ commit, state}, item) {
             try {
                 if (!item.isFavorite) {
                     const obj = {
@@ -172,6 +197,8 @@ export default createStore({
                             isFavorite: true
                         }
                     })
+
+                    commit('setFavorites', [...state.favorites, { ...item }])
                 } else {
                     item.isFavorite = false
                     await axios.delete(`https://b56e406d46f923e3.mokky.dev/favorites/${item.favoriteId}`)
@@ -184,12 +211,11 @@ export default createStore({
                         item.isFavorite = true
                         return item
                     }))
-                    
                 }
             } catch (e) {
                 console.log('Ошибка при добавлении/удалении из избранного:', e)
             }
-        }
+        },
     }
 });
       

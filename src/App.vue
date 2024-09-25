@@ -22,9 +22,7 @@ const openDrawer = () => store.commit('openDrawer')
 
 watch(cart, () => {
     localStorage.setItem('cart', JSON.stringify(cart.value))
-},
-    { deep: true }
-)
+},{ deep: true })
 
 
 </script>

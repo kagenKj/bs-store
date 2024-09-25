@@ -5,9 +5,8 @@
 
     const store = useStore()
     const cart = computed(() => store.state.cart)
-    const removeFromCart = (item) => {
-        store.commit('removeFromCart', item)
-    }
+    const removeFromCart = (item) => store.commit('removeFromCart', item)
+    
 </script>
 
 <template>

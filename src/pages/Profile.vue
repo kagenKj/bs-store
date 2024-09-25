@@ -14,7 +14,7 @@
             const { data } = await axios.get(`https://b56e406d46f923e3.mokky.dev/orders`)
             store.commit('setOrders', data.flatMap((obj) =>  obj.items))
         } catch(e) {
-            alert("Ошибка!")
+            console.log("Ошибка!")
         }
     })
 </script>

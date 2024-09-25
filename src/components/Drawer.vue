@@ -65,8 +65,8 @@
                         <b>{{ vatPrice }} руб</b>
                     </div>
                     <button @click="createOrder" :disabled="buttonDisabled"
-                        class="bg-lime-500 rounded-xl py-3 mt-4 text-white font-bold hover:bg-lime-400 transition active:bg-lime-600 disabled:bg-slate-300 cursor-pointer"
-                        >Оформить заказ
+                        class="bg-lime-500 rounded-xl py-3 mt-4 text-white font-bold hover:bg-lime-400 transition active:bg-lime-600 disabled:bg-slate-300 cursor-pointer">
+                        Оформить заказ
                     </button>
                 </div>
             </div>

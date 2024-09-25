@@ -24,9 +24,6 @@
   
  
     const addToFavorites = (item) =>  store.dispatch('addToFavorites', item)
-  
-
-    const fetchFavorites = () => store.dispatch('fetchFavorites')
 
 
     const fetchItems = () => store.dispatch('fetchItems')
@@ -46,7 +43,6 @@
         const localCart = localStorage.getItem('cart')
         store.commit('setCart', localCart ? JSON.parse(localCart) : [] )
         await fetchItems()
-        await fetchFavorites()
         store.commit('setItems', items.value.map((item) => ({
             ...item,
             isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
